@@ -49,10 +49,10 @@ def signalBuySell(dMA) :
 
 #%% dataframe ---------------------------------
 #variables
-tp = 50
+tp = 20
 
 ##Importation de la data
-klines = np.loadtxt('../rawData/rawTestBtc.csv')
+klines = np.loadtxt('../rawData/rawAllData.csv')
 
 #df raw data
 dfi = pd.DataFrame(data=klines, columns=["timestampOpen", "open", "high", "low", "close", "volume", "timestampClose", "quoteVol", "nbTrade", "TakerBaseVol", "TakerQuoteVol", "ignore"])
@@ -78,6 +78,8 @@ dff = dff.assign(deltaSMA25close = lambda x: x['close'] - x['ma25'])
 dff = dff.assign(ajustedMA = lambda x: ajustedMA(x["open"], tp))
 dff = dff.assign(dAjustedMA = lambda x: ajustedMA(derive(x["ajustedMA"]),tp))
 dff = dff.assign(y = lambda x: signalBuySell(x["dAjustedMA"]))
+
+#["open","high","low","close","quoteVol","rsi14","var","ma25","stochRsiD","stochRsiK","stochRsiInf03","stochRsiSup07","deltaSMA25close","y"]
 
 #replace missing value
 dff = dff.fillna(0)
@@ -146,7 +148,7 @@ print("\n")
 
 #%% exporter en ---------------------------------
 adff = dff[tp*2:len(dff)-tp*2] #*2 parceque il y a le lissage de la ma et de la dma
-adff.to_csv('../data/dataTrain2.csv', index=False)
+adff.to_csv('../data/allData.csv', index=False)
 print(adff)
 
 

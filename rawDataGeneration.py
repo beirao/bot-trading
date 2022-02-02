@@ -6,29 +6,7 @@ Created on Fri Oct  1 17:48:50 2021
 """
 
 from binance.client import Client
-import torch
 import numpy as np
-import pandas as pd
-from tqdm import tqdm
-import seaborn as sns
-from pylab import rcParams
-import matplotlib.pyplot as plt
-from matplotlib import rc
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, classification_report
-from torch import nn, optim
-import torch.nn.functional as F
-import talib as ta
-
-
-sns.set(style='whitegrid', palette='muted', font_scale=1.2)
-HAPPY_COLORS_PALETTE =\
-["#01BEFE", "#FFDD00", "#FF7D00", "#FF006D", "#93D30C", "#8F00FF"]
-sns.set_palette(sns.color_palette(HAPPY_COLORS_PALETTE))
-rcParams['figure.figsize'] = 12, 8
-RANDOM_SEED = 42
-np.random.seed(RANDOM_SEED)
-torch.manual_seed(RANDOM_SEED)
 
 config = eval(open("api.config").read())
 api_key = config['api_key']
@@ -125,11 +103,9 @@ klinesBAT = np.array(klinesBAT)
 klinesBTC = np.array(klinesBTC)
 
 np.savetxt('rawData/rawAllData.csv', kall, fmt='%s')
-np.savetxt('rawData/rawTrainData.csv', kTrain, fmt='%s')
-np.savetxt('rawData/rawTestData.csv', kTest, fmt='%s')
 np.savetxt('rawData/rawTestBat.csv', klinesBAT, fmt='%s')
 np.savetxt('rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
-np.savetxt('rawData/rawTestBtcRandom.csv', client.get_historical_klines("BTCUSDT", "1m", "14 Sep 2019", "16 Sep 2019"), fmt='%s')
+
 
 
 
