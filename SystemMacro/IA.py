@@ -23,8 +23,6 @@ def calculate_accuracy(y_true, y_pred):
 def round_tensor(t, decimal_places=3):
   return round(t.item(), decimal_places)
 
-
-
 def calculate_accuracy_percent(x_test, y_test, per):
     y_test_pred = net(x_test)
     y_test_pred = torch.squeeze(y_test_pred)

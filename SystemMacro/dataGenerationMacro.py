@@ -52,7 +52,7 @@ def signalBuySell(dMA) :
 tp = 20
 
 ##Importation de la data
-klines = np.loadtxt('../rawData/rawAllData.csv')
+klines = np.loadtxt('../rawData/rawTestMatic.csv')
 
 #df raw data
 dfi = pd.DataFrame(data=klines, columns=["timestampOpen", "open", "high", "low", "close", "volume", "timestampClose", "quoteVol", "nbTrade", "TakerBaseVol", "TakerQuoteVol", "ignore"])
@@ -148,7 +148,7 @@ print("\n")
 
 #%% exporter en ---------------------------------
 adff = dff[tp*2:len(dff)-tp*2] #*2 parceque il y a le lissage de la ma et de la dma
-adff.to_csv('../data/allData.csv', index=False)
+adff.to_csv('../data/maticData.csv', index=False)
 print(adff)
 
 
