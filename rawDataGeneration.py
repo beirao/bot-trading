@@ -8,7 +8,7 @@ Created on Fri Oct  1 17:48:50 2021
 from binance.client import Client
 import numpy as np
 
-config = eval(open("api.config").read())
+config = eval(open("./api.config").read())
 api_key = config['api_key']
 secret_key = config['secret_key']
 
@@ -108,8 +108,8 @@ np.savetxt('rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
 np.savetxt('rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
 np.savetxt('rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
 
-klinesMATIC = client.get_historical_klines("MATICUSDT", timeFrame, "17 May 2019", fin)
-np.savetxt('rawData/rawTestMatic.csv', klinesMATIC, fmt='%s')
+klinesMATIC = client.get_historical_klines("MATICUSDT", "1m", "1 Jan 2022", fin)
+np.savetxt('rawData/rawTestMatic1m.csv', klinesMATIC, fmt='%s')
 
 
 

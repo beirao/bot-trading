@@ -16,36 +16,33 @@ import torch.nn.functional as F
 def round_tensor(t, decimal_places=3):
   return round(t.item(), decimal_places)
 
-def simulation(netl,x):
+def simulation(netl,x,walletUSD,threshold):
     y_pred = netl(x)
-    startWallet = 1000
-    walletUSD = startWallet #USDT
 
     fee = 0.001
     buy = False
     nbTrade = 0
     soldeCOIN = 0
-    soldeCOIN_HOLD = (startWallet/p[0])-(startWallet/p[0]*fee)
+    soldeCOIN_HOLD = (walletUSD/p[0])-(walletUSD/p[0]*fee)
+    sumFee = 0
 
-    py = []
+    py=[]
     py = np.array(py)
-
-    threshold = 0.3
 
     for i in range(len(x)) :
         if y_pred[i] > 0.5 + threshold:
             if not buy :
                 soldeCOIN = (walletUSD/p[i])-(walletUSD/p[i]*fee)
+                sumFee += walletUSD/p[i]*fee
                 buy = True
 
             py = np.append(py,(soldeCOIN*p[i]))
-            walletUSD = (soldeCOIN*p[i])
-
             nbTrade = nbTrade + 1
 
-        elif y_pred[i] <= 0.5 - threshold:
+        elif y_pred[i] < 0.5 - threshold:
             if buy :
                 walletUSD = (p[i]*soldeCOIN) - (p[i]*soldeCOIN)*fee
+                sumFee += (p[i]*soldeCOIN)*fee
                 buy = False
             py = np.append(py,walletUSD)
 
@@ -55,11 +52,10 @@ def simulation(netl,x):
     plt.plot(py)
     plt.show()
 
-
-    print("\nwallet HOLD : ",round_tensor(soldeCOIN_HOLD*p[-1]))
-    print("wallet final : ", round_tensor(walletUSD))
-    print("Surperf :",  round_tensor(walletUSD*100/(soldeCOIN_HOLD*p[-1]),10))
+    print("\nwallet HOLD : ",(soldeCOIN_HOLD*p[-1]))
+    print("wallet final : ", (walletUSD))
     print("nb trade : ",nbTrade)
+    print("frais payé : ",sumFee)
     print("\n")
 
 #%% Chargement du model deja entrainé
@@ -85,50 +81,23 @@ class Net(nn.Module):
 netl = torch.load(MODEL_PATH)
 
 #importation data
-df = pd.read_csv('../data/maticData.csv')
+df = pd.read_csv('../data/maticData1m.csv')
 
 x = df[["rsi14","var","ma25","stochRsiD","stochRsiInf03","stochRsiSup07","deltaSMA25close"]] #sans var c'est mieux
-y = df[['y']]
 p = df[['open']]
 
 x = torch.tensor(x.values).float()
-y = torch.tensor(y.values).float()
 p = torch.tensor(p.values).float()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-#device = "cpu"
+device = "cpu"
 
 x = x.to(device)
-y = y.to(device)
 netl = netl.to(device)
 
 
 #%% simu ------------------------------
-simulation(netl,x)
-
-#%% affichage ---------------------------------
-#plt.figure(figsize=(10,7))
-#
-#plt.subplot(3,1,1)
-#plt.title("Prix pur")
-#plt.yscale("log")
-#plt.plot(dff['open'][tp*2:len(dff)-tp*2])
-#displayBuySell(dff['dAjustedMA'],tp)
-#
-#plt.subplot(3,1,2)
-#plt.title("MA")
-#plt.yscale("log")
-#plt.plot(dff['ajustedMA'][tp*2:len(dff)-tp*2])
-#displayBuySell(dff['dAjustedMA'],tp)
-#
-#plt.subplot(3,1,3)
-#plt.title("Derivé de la MA")
-#plt.plot(np.full(shape=len(dff['dAjustedMA'][tp*2:len(dff)-tp*2]), fill_value = 0), 'r')
-#plt.plot(dff['dAjustedMA'][tp*2:len(dff)-tp*2])
-#displayBuySell(dff['dAjustedMA'],tp)
-#
-#plt.show()
-
+simulation(netl,x,1000,0.4)
 
 
 
