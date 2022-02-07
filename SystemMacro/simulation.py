@@ -32,12 +32,16 @@ def simulation(netl,x,walletUSD,threshold,p):
 
     py=[]
     py = np.array(py)
+    fig = plt.figure(figsize=(13,10))
+    ax1 = fig.add_subplot(111)
+    ax2 = ax1.twiny()
 
     for i in range(len(x)) :
         if y_pred[i] > 0.5 + threshold:
             if not buy :
                 soldeCOIN = (walletUSD/p[i])-(walletUSD/p[i]*fee)
                 sumFee += walletUSD/p[i]*fee
+                #plt.axvline(i,color='green')
                 buy = True
 
             py = np.append(py,(soldeCOIN*p[i]))
@@ -48,12 +52,16 @@ def simulation(netl,x,walletUSD,threshold,p):
                 walletUSD = (p[i]*soldeCOIN) - (p[i]*soldeCOIN)*fee
                 sumFee += (p[i]*soldeCOIN)*fee
                 buy = False
+                #plt.axvline(i,color='red')
             py = np.append(py,walletUSD)
 
-    plt.figure(figsize=(13,10))
+
+
     plt.title('Evolution du wallet')
-#    plt.yscale("log")
-    plt.plot(py)
+    plt.yscale("log")
+    ax1.plot(py,'r',label="wallet evolution from 1000 USD")
+    ax2.plot(p, label="prix asset")
+    fig.legend()
     plt.show()
 
     print("\nwallet HOLD : ",(soldeCOIN_HOLD*p[-1]))
@@ -70,7 +78,7 @@ model, xdef = initModel(path+"/model.pth")
 #importation data
 df = pd.read_csv('../data/btcData.csv')
 x = df[xdef] #sans var c'est mieux
-p = df[['open']]
+p = df[['close']]
 
 x = torch.tensor(x.values).float()
 p = torch.tensor(p.values).float()
