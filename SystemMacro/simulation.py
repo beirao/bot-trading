@@ -9,8 +9,10 @@ import torch
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from torch import nn
-import torch.nn.functional as F
+import sys
+import os
+from initModel import initModel
+
 
 #%% fonctions ------------------
 def round_tensor(t, decimal_places=3):
@@ -48,7 +50,7 @@ def simulation(netl,x,walletUSD,threshold):
 
     plt.figure(figsize=(13,10))
     plt.title('Evolution du wallet')
-    plt.yscale("log")
+#    plt.yscale("log")
     plt.plot(py)
     plt.show()
 
@@ -59,30 +61,12 @@ def simulation(netl,x,walletUSD,threshold):
     print("\n")
 
 #%% Chargement du model deja entrainé
-MODEL_PATH = '../model/modelTP20.pth'
-
-class Net(nn.Module):
-    def __init__(self,enter):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(enter,32)
-        self.fc2 = nn.Linear(32, 54)
-        self.fc3 = nn.Linear(54, 40)
-        self.fc4 = nn.Linear(40, 10)
-        self.fcf = nn.Linear(10, 1) #si 1 hausse si 0 baisse
-
-    def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
-        x = F.relu(self.fc4(x))
-        x = torch.sigmoid(self.fcf(x))
-        return x
-
-netl = torch.load(MODEL_PATH)
+path = "../model/model-V1-TP20"
+sys.path.append(os.path.abspath(path))
+netl  = initModel(path+"/model.pth")
 
 #importation data
-df = pd.read_csv('../data/maticData1m.csv')
-
+df = pd.read_csv('../data/btcData.csv')
 x = df[["rsi14","var","ma25","stochRsiD","stochRsiInf03","stochRsiSup07","deltaSMA25close"]] #sans var c'est mieux
 p = df[['open']]
 

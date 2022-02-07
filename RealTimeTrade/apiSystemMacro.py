@@ -6,14 +6,14 @@ Created on Wed Feb  2 21:34:53 2022
 """
 
 from binance.client import Client
-import numpy as np
 import pandas as pd
 import talib as ta
 import torch
-from torch import nn
-import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import time
+import sys
+import os
+from initModel import initModel
 
 #%%variables -------
 time_frame = Client.KLINE_INTERVAL_1MINUTE
@@ -28,25 +28,11 @@ wallet_coin = 0
 
 fin = "1 Feb 2022"
 api_path = "../api.config"
-model_path = "../model/modelTP20.pth"
 
-
-class Net(nn.Module):
-    def __init__(self,enter):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(enter,32)
-        self.fc2 = nn.Linear(32, 54)
-        self.fc3 = nn.Linear(54, 40)
-        self.fc4 = nn.Linear(40, 10)
-        self.fcf = nn.Linear(10, 1) #si 1 hausse si 0 baisse
-
-    def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
-        x = F.relu(self.fc4(x))
-        x = torch.sigmoid(self.fcf(x))
-        return x
+#%% Chargement du model deja entrainé
+path = "../model/model-V1-TP20"
+sys.path.append(os.path.abspath(path))
+model  = initModel(path+"/model.pth")
 
 #%% fonctions -----
 def initBinanceClient(path_to_config):
@@ -139,7 +125,6 @@ def visualizations(results) :
 
 #%% main
 client = initBinanceClient(api_path)
-model = initModel(model_path)
 results = pd.DataFrame()
 
 try :
@@ -151,14 +136,8 @@ try :
         results = results.append(pd.DataFrame([[wallet_coin, wallet_stable, order_fee, df['close'].iloc[-1]]], columns=['wallet_coin', 'wallet_stable', 'fee', 'price']), ignore_index=True)
         visualizations(results)
         time.sleep(trading_period)
-
 except :
     pass
-
-
-
-
-
 
 
 

@@ -80,7 +80,6 @@ k1 = klines1INCH + klinesAAVE + klinesADA + klinesALGO + klinesALPHA + klinesALP
 #k4 =
 
 
-kTrain = k0 + k1
 
 klinesBAT = client.get_historical_klines("BATUSDT", timeFrame, "14 Apr 2019", fin)
 klinesDIA = client.get_historical_klines("DIAUSDT", timeFrame, "14 Sep 2020", fin)
@@ -93,19 +92,15 @@ klinesSUSHI = client.get_historical_klines("SUSHIUSDT", timeFrame, "14 Sep 2020"
 klinesSXP = client.get_historical_klines("SXPUSDT", timeFrame, "14 Sep 2020", fin)
 klinesWAN = client.get_historical_klines("WANUSDT", timeFrame, "14 Sep 2019", fin)
 
-kTest = klinesNEAR + klinesDIA + klinesFET + klinesLUNA + klinesXMR + klinesBAT + klinesSC + klinesSUSHI + klinesWAN + klinesSXP
-kall = kTrain + kTest
+k2 = klinesNEAR + klinesDIA + klinesFET + klinesLUNA + klinesXMR + klinesBAT + klinesSC + klinesSUSHI + klinesWAN + klinesSXP
+kall = k0 + k1 + k2
 
 kall = np.array(kall)
-kTrain = np.array(kTrain)
-kTest = np.array(kTest)
 klinesBAT = np.array(klinesBAT)
 klinesBTC = np.array(klinesBTC)
 
 np.savetxt('rawData/rawAllData.csv', kall, fmt='%s')
 np.savetxt('rawData/rawTestBat.csv', klinesBAT, fmt='%s')
-np.savetxt('rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
-np.savetxt('rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
 np.savetxt('rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
 
 klinesMATIC = client.get_historical_klines("MATICUSDT", "1m", "1 Jan 2022", fin)
