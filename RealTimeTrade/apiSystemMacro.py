@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 import time
 import sys
 import os
-from initModel import initModel
+path = "../model/model-V1-TP20"
+sys.path.append(os.path.abspath(path))
+from initModel import Net,initModel
 
 #%%variables -------
 time_frame = Client.KLINE_INTERVAL_1MINUTE
@@ -30,11 +32,10 @@ fin = "1 Feb 2022"
 api_path = "../api.config"
 
 #%% Chargement du model deja entrainé
-path = "../model/model-V1-TP20"
-sys.path.append(os.path.abspath(path))
-model  = initModel(path+"/model.pth")
+model = Net
+model, xdef = initModel(path+"/model.pth")
 
-#%% fonctions -----
+#%% fonctions --------------
 def initBinanceClient(path_to_config):
     config = eval(open(path_to_config).read())
     api_key = config['api_key']
@@ -118,10 +119,7 @@ def visualizations(results) :
     print("wallet final : ", wallet.iloc[-1])
     print("nb trade : ", nb_trade)
     print("frais payés : ", total_fee)
-
     print("\n")
-
-
 
 #%% main
 client = initBinanceClient(api_path)

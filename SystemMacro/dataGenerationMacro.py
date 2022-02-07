@@ -119,7 +119,6 @@ soldeCOIN_HOLD = (startWallet/dff['close'][tp*2])-(soldeCOIN*fee)
 py = []
 py = np.array(py)
 
-
 for i in range(tp*2,len(dff['close'])-tp*2):
     if(dff['y'][i] == 1 and buy == False) :
         soldeCOIN = (walletUSD/dff['close'][i])-(soldeCOIN*fee)
