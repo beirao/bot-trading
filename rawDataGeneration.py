@@ -39,47 +39,6 @@ klinesAVAX = client.get_historical_klines("AVAXUSDT", timeFrame, "14 Oct 2020", 
 klinesBAND = client.get_historical_klines("BANDUSDT", timeFrame, "14 Nov 2019", fin)
 
 k1 = klines1INCH + klinesAAVE + klinesADA + klinesALGO + klinesALPHA + klinesALPHA + klinesATOM + klinesARPA + klinesANKR + klinesAVAX + klinesBAND
-#
-
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#
-#k2 =
-#
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#
-#k3 =
-#
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#klines = client.get_historical_klines("USDT", timeFrame, "14 Sep 2019", fin)
-#
-#k4 =
-
-
 
 klinesBAT = client.get_historical_klines("BATUSDT", timeFrame, "14 Apr 2019", fin)
 klinesDIA = client.get_historical_klines("DIAUSDT", timeFrame, "14 Sep 2020", fin)
@@ -99,12 +58,12 @@ kall = np.array(kall)
 klinesBAT = np.array(klinesBAT)
 klinesBTC = np.array(klinesBTC)
 
-np.savetxt('rawData/rawAllData.csv', kall, fmt='%s')
-np.savetxt('rawData/rawTestBat.csv', klinesBAT, fmt='%s')
-np.savetxt('rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
+np.savetxt('data/rawData/rawAllData.csv', kall, fmt='%s')
+np.savetxt('data/rawData/rawTestBat.csv', klinesBAT, fmt='%s')
+np.savetxt('data/rawData/rawTestBtc.csv', klinesBTC, fmt='%s')
 
 klinesMATIC = client.get_historical_klines("MATICUSDT", "1m", "1 Jan 2022", fin)
-np.savetxt('rawData/rawTestMatic1m.csv', klinesMATIC, fmt='%s')
+np.savetxt('data/rawData/rawTestMatic1m.csv', klinesMATIC, fmt='%s')
 
 
 

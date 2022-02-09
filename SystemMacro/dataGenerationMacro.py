@@ -8,27 +8,14 @@ import numpy as np
 import pandas as pd
 import talib as ta
 import matplotlib.pyplot as plt
+import sys
+import os
+
+pathFunctions = "../sources"
+sys.path.append(os.path.abspath(pathFunctions))
+import functions as f
 
 #%% fonctions---------------------------------
-def ajustedMA(p, tp) :
-    i = 0
-    rl  = [0.0 for i in range(len(p))]
-    rl = np.array(rl)
-    for ip in p :
-        if(i >= tp and i <= len(p)-tp):
-            rl[i] = np.sum([p[t] for t in range(i-tp,i+tp)])
-        else:
-            rl[i] = np.nan
-        i = i + 1
-    return rl
-
-def derive(x) :
-    xn  = [0.0 for i in range(len(x))]
-    for i in range(len(x)-1):
-        xn[i] = x[i+1]-x[i]
-    #xn[len(x)] = x[len(x-1)]
-    return np.array(xn)
-
 def displayBuySell(dMA,tp):
     for i in range(tp*2,len(dMA[tp:len(dMA)-tp])):
         if(dMA[i-1] <= 0 and dMA[i] >= 0) :
@@ -52,31 +39,12 @@ def signalBuySell(dMA) :
 tp = 20
 
 ##Importation de la data
-klines = np.loadtxt('../rawData/rawTestMatic1m.csv')
-
-#df raw data
-dfi = pd.DataFrame(data=klines, columns=["timestampOpen", "open", "high", "low", "close", "volume", "timestampClose", "quoteVol", "nbTrade", "TakerBaseVol", "TakerQuoteVol", "ignore"])
-
-# calcule des datas x
-dff = pd.DataFrame()
-dff["open"] = dfi["open"]
-dff["high"] = dfi["high"]
-dff["low"] = dfi["low"]
-dff["close"] = dfi["close"]
-dff["quoteVol"] = dfi["quoteVol"]
-dff = dff.assign(rsi14 = lambda x: ta.RSI(x['open'], timeperiod=14)/100)
-dff = dff.assign(var = lambda x: ((x["close"]-x["open"])*100)/x["open"])
-dff = dff.assign(ma25 = lambda x: ta.MA(x["open"], timeperiod=25))
-dff = dff.assign(stochRsiD = lambda x: ta.STOCH(x["high"], x["low"], x["close"], fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)[1])
-dff = dff.assign(stochRsiK = lambda x: ta.STOCH(x["high"], x["low"], x["close"], fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)[0])
-dff['stochRsiInf03'] = dff['stochRsiK'].apply(lambda x: 1 if x <= 30 else 0)
-dff['stochRsiSup07'] = dff['stochRsiK'].apply(lambda x: 1 if x >= 70 else 0)
-dff = dff.assign(deltaSMA25close = lambda x: x['close'] - x['ma25'])
-#dff = dff.assign(stochRsiCross = lambda x: 1 if(x["stochRsiK"] >= x["stochRsiD"]  and x["stochRsiK"] <= x["stochRsiD"]) else 0
+candles = np.loadtxt('../data/rawData/rawTestMatic1m.csv')
+dff = f.processDataX(candles)
 
 # calcule des datas y
-dff = dff.assign(ajustedMA = lambda x: ajustedMA(x["open"], tp))
-dff = dff.assign(dAjustedMA = lambda x: ajustedMA(derive(x["ajustedMA"]),tp))
+dff = dff.assign(ajustedMA = lambda x: f.ajustedMA(x["open"], tp))
+dff = dff.assign(dAjustedMA = lambda x: f.ajustedMA(f.derive(x["ajustedMA"]),tp))
 dff = dff.assign(y = lambda x: signalBuySell(x["dAjustedMA"]))
 
 #["open","high","low","close","quoteVol","rsi14","var","ma25","stochRsiD","stochRsiK","stochRsiInf03","stochRsiSup07","deltaSMA25close","y"]
@@ -147,7 +115,7 @@ print("\n")
 
 #%% exporter en ---------------------------------
 adff = dff[tp*2:len(dff)-tp*2] #*2 parceque il y a le lissage de la ma et de la dma
-adff.to_csv('../data/maticData1m.csv', index=False)
+adff.to_csv('../data/trainData/maticData1m.csv', index=False)
 print(adff)
 
 

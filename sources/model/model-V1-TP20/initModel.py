@@ -8,6 +8,8 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
+xdef = ["rsi14","var","ma25","stochRsiD","stochRsiInf03","stochRsiSup07","deltaSMA25close"]
+
 class Net(nn.Module):
     def __init__(self,enter):
         super(Net, self).__init__()
@@ -26,7 +28,6 @@ class Net(nn.Module):
         return x
 
 def initModel(pathModel):
-    xdef = ["rsi14","var","ma25","stochRsiD","stochRsiInf03","stochRsiSup07","deltaSMA25close"]
-    return torch.load(pathModel), xdef
+    return torch.load(pathModel)
 
 
