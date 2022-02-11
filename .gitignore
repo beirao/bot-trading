@@ -1,3 +1,4 @@
 #ignore .config
 *.config
 *.pyc
+*.csv

@@ -58,9 +58,9 @@ def calculate_accuracy_percent(x_test, y_test, per):
         return -1,-1
 
 #%% variables
-nbEpoch = 500
-lr=0.005
-pathTrainData = '../data/trainData/allData.csv'
+nbEpoch = 2000
+lr=0.001
+pathTrainData = '../data/trainData/mainCoinData.csv'
 
 #%% model IA ------------------------------
 df = pd.read_csv(pathTrainData)
@@ -115,11 +115,13 @@ Test  set - loss: {f.round_tensor(test_loss)}, accuracy: {f.round_tensor(test_ac
     train_loss.backward()
     optimizer.step()
 
-torch.save(net, pathModel+"model.pth")
-net = torch.load(pathModel+"model.pth")
+torch.save(net, pathModel+"/model.pth")
+net = torch.load(pathModel+"/model.pth")
 
-calculate_accuracy_percent(x_test, y_test,0)
-calculate_accuracy_percent(x_test, y_test,0.15)
+#calculate_accuracy_percent(x_test, y_test,0)
+#calculate_accuracy_percent(x_test, y_test,0.15)
+#calculate_accuracy_percent(x_test, y_test,0.30)
+#calculate_accuracy_percent(x_test, y_test,0.45)
 
 
 

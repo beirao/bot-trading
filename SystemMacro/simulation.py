@@ -11,6 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sys
 import os
+import talib as ta
+
 
 pathModel = "../sources/model/model-V1-TP20"
 sys.path.append(os.path.abspath(pathModel))
@@ -22,8 +24,12 @@ import functions as f
 
 #%% fonctions ------------------
 
-def simulationConsecutive(netl,x, p, walletUSD, threshold, fee, logScale):
+def simulationConsecutive(netl,x, p, walletUSD, threshold, fee, tp, logScale, plotBuySell):
     y_pred = netl(x)
+    yp = y_pred.detach().numpy()
+    yp = [float(x) for x in yp]
+    yp = np.array(yp)
+    yp = ta.MA(yp,tp)
 
     buy = False
     nbTrade = 0
@@ -33,29 +39,32 @@ def simulationConsecutive(netl,x, p, walletUSD, threshold, fee, logScale):
 
     py=[]
     py = np.array(py)
-    fig = plt.figure(figsize=(16,8))
+
+    fig = plt.figure(figsize=(14,10))
+    #plt.subplot(2,1,1)
 
     for i in range(len(x)) :
-        if y_pred[i] > 0.5 + threshold and y_pred[i-1] > 0.5  + threshold and y_pred[i-2] > 0.5 + threshold :
+        if yp[i] > 0.5 + threshold and yp[i-1] > 0.5  + threshold  :
             if not buy :
                 soldeCOIN = (walletUSD/p[i])-(walletUSD/p[i]*fee)
                 sumFee += walletUSD/p[i]*fee
                 buy = True
-                plt.axvline(i,color='green')
+                if plotBuySell :
+                    plt.axvline(i,color='green')
             nbTrade = nbTrade + 1
 
-        elif y_pred[i] < 0.5 - threshold and y_pred[i-1] < 0.5 - threshold and y_pred[i-2] < 0.5 - threshold :
+        elif yp[i] < 0.5 - threshold and yp[i-1] < 0.5 - threshold  :
             if buy :
                 walletUSD = (p[i]*soldeCOIN) - (p[i]*soldeCOIN)*fee
                 sumFee += (p[i]*soldeCOIN)*fee
                 buy = False
-                plt.axvline(i,color='red')
+                if plotBuySell :
+                    plt.axvline(i,color='red')
 
         if buy :
             py = np.append(py,(soldeCOIN*p[i]))
         else :
             py = np.append(py,walletUSD)
-
 
     plt.title('Evolution du wallet')
     if logScale:
@@ -63,6 +72,10 @@ def simulationConsecutive(netl,x, p, walletUSD, threshold, fee, logScale):
     plt.plot(py,'r',label="wallet evolution from 1000 USD")
     plt.plot(p, label="prix asset")
     fig.legend()
+
+#    plt.subplot(2,1,2)
+#    plt.plot(ta.MA(yp,tp))
+
     plt.show()
 
     print("\nwallet HOLD : ",(soldeCOIN_HOLD*p[-1]).item())
@@ -80,7 +93,7 @@ model = Net
 model = initModel(pathModel+"/model.pth")
 
 #importation data
-df = pd.read_csv('../data/trainData/btcData.csv')
+df = pd.read_csv('../data/trainData/maticData.csv') #.iloc[220000:235000]
 x = df[xdef] #sans var c'est mieux
 p = df[['close']]
 
@@ -90,8 +103,10 @@ model = model.to("cpu")
 
 
 #%% simu ------------------------------
-simulationConsecutive(model,x,p, walletUSD = 1000, threshold = 0.3, fee = 0.001, logScale = True)
-f.simulationThreshold(model,x,p, walletUSD = 1000, threshold = 0.3, fee = 0.001, logScale = True)
+# marche bien
+simulationConsecutive(model,x,p, walletUSD = p[0], threshold = 0.3, fee = 0.001, tp = 2, logScale = True, plotBuySell = False)
+#f.simulationThreshold(model,x,p, walletUSD = p[0], threshold = 0.4, fee = 0.001, logScale = True)
+
 
 
 

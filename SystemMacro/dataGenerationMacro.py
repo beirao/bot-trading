@@ -39,7 +39,7 @@ def signalBuySell(dMA) :
 tp = 20
 
 ##Importation de la data
-candles = np.loadtxt('../data/rawData/rawTestMatic1m.csv')
+candles = np.loadtxt('../data/rawData/rawLTC.csv')
 dff = f.processDataX(candles)
 
 # calcule des datas y
@@ -115,7 +115,7 @@ print("\n")
 
 #%% exporter en ---------------------------------
 adff = dff[tp*2:len(dff)-tp*2] #*2 parceque il y a le lissage de la ma et de la dma
-adff.to_csv('../data/trainData/maticData1m.csv', index=False)
+adff.to_csv('../data/trainData/ltcData.csv', index=False)
 print(adff)
 
 

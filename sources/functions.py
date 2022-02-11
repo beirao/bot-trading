@@ -32,14 +32,21 @@ def processDataX(candles) :
     df["low"] = dfi["low"].astype(float, errors = 'raise')
     df["close"] = dfi["close"].astype(float, errors = 'raise')
     df["quoteVol"] = dfi["quoteVol"].astype(float, errors = 'raise')
+    df = df.assign(quoteVolMoy25 = lambda x: x["quoteVol"]/np.mean(x["quoteVol"].iloc[-25:]))
+    df = df.assign(deltaOpenClose = lambda x: (np.abs(x["open"]-x["close"]))/x["close"])
+    df = df.assign(deltaHighClose = lambda x: (np.abs(x["high"]-x["close"]))/x["close"])
+    df = df.assign(deltaLowClose  = lambda x: (np.abs(x["low"]-x["close"]))/x["close"])
     df = df.assign(rsi14 = lambda x: ta.RSI(x['open'], timeperiod=14)/100)
     df = df.assign(var = lambda x: ((x["close"] - x["open"])*100)/x["open"])
+    #df = df.assign(varMoy25 = lambda x: )
     df = df.assign(ma25 = lambda x: ta.MA(x["open"], timeperiod=25))
     df = df.assign(stochRsiD = lambda x: ta.STOCH(x["high"], x["low"], x["close"], fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)[1])
     df = df.assign(stochRsiK = lambda x: ta.STOCH(x["high"], x["low"], x["close"], fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)[0])
     df['stochRsiInf03'] = df['stochRsiK'].apply(lambda x: 1 if x <= 30 else 0)
     df['stochRsiSup07'] = df['stochRsiK'].apply(lambda x: 1 if x >= 70 else 0)
     df = df.assign(deltaSMA25close = lambda x: x['close'] - x['ma25'])
+
+    #["open","high","low","close","quoteVol", "quoteVolMoy25", "deltaOpenClose", "deltaHighClose", "deltaLowClose", "rsi14","var","ma25","stochRsiD","stochRsiK","stochRsiInf03","stochRsiSup07","deltaSMA25close"]
 
     return df
 
@@ -65,7 +72,7 @@ def simulationThreshold(netl, x, p, walletUSD, threshold, fee, logScale):
                 plt.axvline(i,color='green')
             nbTrade = nbTrade + 1
 
-        elif y_pred[i] < 0.5 - threshold:
+        elif y_pred[i] < 0.5:
             if buy :
                 walletUSD = (p[i]*soldeCOIN) - (p[i]*soldeCOIN)*fee
                 sumFee += (p[i]*soldeCOIN)*fee
