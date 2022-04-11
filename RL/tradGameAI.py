@@ -27,11 +27,12 @@ class Trade(Enum):
 class TradeGameAI() :
     
     def __init__(self, rawTradingDataPath) :
-        self.reset(rawTradingDataPath)
+        self.rawTradingDataPath = rawTradingDataPath
+        self.reset()
 
-    def reset(self, rawTradingDataPath) :
+    def reset(self) :
         # Importation de la data
-        self.tradingData = f.processDataX(np.loadtxt(rawTradingDataPath))
+        self.get_data()
         
         # Paramz
         self.walletValue = 1000
@@ -44,7 +45,9 @@ class TradeGameAI() :
         self.currentIndex = 1
         self.walletHistory = [self.walletValue]
         self.lastTradeWallet = 0
-
+    
+    def get_data(self) :
+        self.tradingData = f.processDataX(np.loadtxt(self.rawTradingDataPath))
 
     def play_step(self, action): 
         # init

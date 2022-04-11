@@ -36,7 +36,8 @@ class TradeGame() :
     
     def __init__(self, rawTradingDataPath) :
         # Importation de la data
-        self.tradingData = f.processDataX(np.loadtxt(rawTradingDataPath))
+        self.rawTradingDataPath = rawTradingDataPath
+        self.get_data()
         
         # Paramz
         self.walletValue = 1000
@@ -49,7 +50,9 @@ class TradeGame() :
         self.currentIndex = 1
         self.walletHistory = [self.walletValue]
 
-
+    def get_data(self) :
+        self.tradingData = f.processDataX(np.loadtxt(self.rawTradingDataPath))       
+            
     def play_step(self): 
         self.currentTradingData.append(self.tradingData.iloc[self.currentIndex])
         self.currentIndex += 1   

@@ -2,44 +2,66 @@ import torch
 import random
 import numpy as np
 from collections import deque
-from tradGame import TradeGame
+from tradGameAI import TradeGameAI
+import sys
+import os
+from model import Linear_QNet, QTrainer
 
+pathFunctions = "../src/"
+sys.path.append(os.path.abspath(pathFunctions))
+import functions as f
 
-MAX_MEMORY = 100000
+MAX_MEMORY = 1000000
 BATCH_SIZE = 1000
-lr = 0.001
+LR = 0.001
 
 class Agent : 
     def __init__(self) :
-        self.nb_trade = 0
+        self.n_games = 0 
         self.epsilon = 0
         self.gamma = 0
         self.memory = deque(maxlen = MAX_MEMORY)
-        # TODO : model, trainer
         
+        self.model = Linear_QNet(11, 256, 3)
+        self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
     
     def get_state(self, tradeGame) :
-        pass
+        return tradeGame.currentTradingData[-1].to_numpy()
     
     def remember(self, state, action, reward, next_state, done) :
-        pass
+        self.memory.append((state, action, reward, next_state, done)) # popleft if MAX_MEMORY is reached
     
     def train_long_memory(self) :
-        pass
+        if len(self.memory) > BATCH_SIZE:
+            mini_sample = random.sample(self.memory, BATCH_SIZE) # list of tuples
+        else:
+            mini_sample = self.memory
+
+        states, actions, rewards, next_states, dones = zip(*mini_sample)
+        self.trainer.train_step(states, actions, rewards, next_states, dones)
     
-    def train_short_memory(self) :
-        pass
+    def train_short_memory(self, state, action, reward, next_state, done) :
+        self.trainer.train_step(state, action, reward, next_state, done)
     
     def get_action(self,state):
-        pass
+        # random moves: tradeoff exploration / exploitation
+        self.epsilon = 40 - self.n_games
+        if random.randint(0, 200) < self.epsilon:
+            prediction = random.random()
+        else:
+            state0 = torch.tensor(state, dtype=torch.float)
+            prediction = self.model(state0)
+    
+        return prediction
         
 def train() :
+    path = '../src/data/rawData/rawEth.csv'
     plot_scores = []
     plot_mean_scores = []
     total_score = 0
     record = 0
     agent = Agent()
-    tradeGame = TradeGame()
+    tradeGame = TradeGameAI(path)
     
     while True :
         # get old state
@@ -61,7 +83,7 @@ def train() :
         if done :
             # train long memory, plot result
             tradeGame.reset()
-            agent.nb_trade += 1
+            agent.n_games += 1
             agent.train_long_memory()
             
             if score > record :
