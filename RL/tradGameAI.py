@@ -41,18 +41,28 @@ class TradeGameAI() :
         # Temp
         self.currentState = Trade.NEUTRAL
         self.lastState = Trade.NEUTRAL
-        self.currentTradingData = [self.tradingData.iloc[0], self.tradingData.iloc[1]]
-        self.currentIndex = 1
+        self.currentTradingData = [self.tradingData.iloc[0]]
+        self.currentIndex = 0
         self.walletHistory = [self.walletValue]
         self.lastTradeWallet = 0
     
     def get_data(self) :
-        self.tradingData = f.processDataX(np.loadtxt(self.rawTradingDataPath))
+        self.tradingData = f.processDataX(np.loadtxt(self.rawTradingDataPath))[25:325]
 
     def play_step(self, action): 
+        # check if it is the end 
+        end = False
+        if self.walletValue == 0 or self.currentIndex >= len(self.tradingData):
+            end = True
+            print(1000*(self.currentTradingData[-1]['open']/self.currentTradingData[0]['open']))
+            if(1000*(self.currentTradingData[-1]['open']/self.currentTradingData[0]['open']) < self.walletValue) :
+                reward = 50
+            else :
+                reward = -50
+            return reward, end, self.walletValue
+        
         # init
-        self.currentTradingData.append(self.tradingData.iloc[self.currentIndex])
-        self.currentIndex += 1   
+        self.currentTradingData.append(self.tradingData.iloc[self.currentIndex]) 
         
         # action traduction
         if action > 0.5 :
@@ -81,28 +91,27 @@ class TradeGameAI() :
             else :
                 reward = -10
         
-        # plot
-        plt.figure(figsize=(14,10))
-        plt.figure(1)             
-        plt.subplot(211)           
-        plt.plot([self.currentTradingData[i]['open'] for i in range(len(self.currentTradingData))])
-        plt.title('Price')
-        plt.subplot(212)          
-        plt.plot(self.walletHistory)
-        plt.title('Wallet')
-        plt.show()
+        self.currentIndex += 1  
         
-        # check if it is the end 
-        end = False
-        if self.walletValue == 0 or self.currentIndex-1 >= len(self.tradingData):
-            end = True
-            return reward, end, self.walletValue
+        # plot
+        # plt.figure(figsize=(14,10))
+        # plt.figure(1)             
+        # plt.subplot(211)           
+        # plt.plot([self.currentTradingData[i]['open'] for i in range(len(self.currentTradingData))])
+        # plt.title('Price')
+        # plt.subplot(212)          
+        # plt.plot(self.walletHistory)
+        # plt.title('Wallet')
+        # plt.show()
+        
         
         # end  
         self.lastState = self.currentState
         return reward, end, self.walletValue
 
 
+    
+    
     
     
     

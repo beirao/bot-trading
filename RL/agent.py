@@ -6,23 +6,24 @@ from tradGameAI import TradeGameAI
 import sys
 import os
 from model import Linear_QNet, QTrainer
+from helper import plot
 
 pathFunctions = "../src/"
 sys.path.append(os.path.abspath(pathFunctions))
 import functions as f
 
 MAX_MEMORY = 1000000
-BATCH_SIZE = 1000
+BATCH_SIZE = 10000
 LR = 0.001
 
 class Agent : 
     def __init__(self) :
         self.n_games = 0 
         self.epsilon = 0
-        self.gamma = 0
+        self.gamma = 0.9
         self.memory = deque(maxlen = MAX_MEMORY)
         
-        self.model = Linear_QNet(11, 256, 3)
+        self.model = Linear_QNet(17)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
     
     def get_state(self, tradeGame) :
@@ -49,7 +50,7 @@ class Agent :
         if random.randint(0, 200) < self.epsilon:
             prediction = random.random()
         else:
-            state0 = torch.tensor(state, dtype=torch.float)
+            state0 = torch.tensor(state, dtype=torch.float).to(self.trainer.device)
             prediction = self.model(state0)
     
         return prediction
@@ -90,9 +91,14 @@ def train() :
                 record = score
                 # agent.model.save()
             
-            print('nb_trade : ', agent.nb_trade,'Score : ', score, 'Record : ', record)
-            # TODO : plot
+            print('n_games : ', agent.n_games,'Score : ', score, 'Record : ', record)
             
+            # plot
+            plot_scores.append(score)
+            total_score += score
+            mean_score = total_score / agent.n_games
+            plot_mean_scores.append(mean_score)
+            plot(plot_scores, plot_mean_scores)
         
 if __name__ == '__main__' :
     train()

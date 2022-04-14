@@ -33,7 +33,7 @@ class Trade(Enum):
     SELL = 3
 
 class TradeGame() :
-    
+    12
     def __init__(self, rawTradingDataPath) :
         # Importation de la data
         self.rawTradingDataPath = rawTradingDataPath
