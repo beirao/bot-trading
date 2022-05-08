@@ -14,6 +14,9 @@ import keyboard
 from collections import namedtuple
 import matplotlib.pyplot as plt
 
+pathModel = "pre-trained_model"
+sys.path.append(os.path.abspath(pathModel))
+from initModel import xdef
 
 pathFunctions = "../src/"
 sys.path.append(os.path.abspath(pathFunctions))
@@ -47,7 +50,7 @@ class TradeGameAI() :
         self.lastTradeWallet = 0
     
     def get_data(self) :
-        self.tradingData = f.processDataX(np.loadtxt(self.rawTradingDataPath))[25:325]
+        self.tradingData = f.processDataX(np.loadtxt(self.rawTradingDataPath))[25:][xdef]
 
     def play_step(self, action): 
         # check if it is the end 
@@ -56,9 +59,9 @@ class TradeGameAI() :
             end = True
             print(1000*(self.currentTradingData[-1]['open']/self.currentTradingData[0]['open']))
             if(1000*(self.currentTradingData[-1]['open']/self.currentTradingData[0]['open']) < self.walletValue) :
-                reward = 50
+                reward = 100
             else :
-                reward = -50
+                reward = -100
             return reward, end, self.walletValue
         
         # init
@@ -85,11 +88,11 @@ class TradeGameAI() :
         
         # reward trigger
         reward = 0
-        if(self.currentState == Trade.SELL and self.lastState == Trade.BUY) :
-            if(self.lastTradeWallet < self.walletValue) :
-                reward = 10
-            else :
-                reward = -10
+        # if(self.currentState == Trade.SELL and self.lastState == Trade.BUY) :
+        if(self.lastTradeWallet < self.walletValue) :
+            reward = 10
+        else :
+            reward = -10
         
         self.currentIndex += 1  
         

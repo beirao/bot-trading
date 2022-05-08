@@ -24,3 +24,6 @@ def plot(scores, mean_scores):
     plt.text(len(mean_scores)-1, mean_scores[-1], str(mean_scores[-1]))
     plt.show(block=False)
     plt.pause(.1)
+    plt.clf()
+    plt.cla()
+    plt.close()

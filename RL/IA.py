@@ -17,11 +17,11 @@ import os
 import torch.nn.functional as F
 
 
-pathModel = "../model/model-V2-TP13"
+pathModel = "pre-trained_model"
 sys.path.append(os.path.abspath(pathModel))
-from initModel import  xdef
+from initModel import xdef
 
-pathFunctions = "../../src"
+pathFunctions = "../src"
 sys.path.append(os.path.abspath(pathFunctions))
 import functions as f
 
@@ -59,32 +59,49 @@ def calculate_accuracy_percent(x_test, y_test, per):
         print("Pas de résultat.")
         return -1,-1
 
-class Net(nn.Module):
+
+class Linear_QNet(nn.Module):
     def __init__(self,enter):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(enter,30)
-        self.fc2 = nn.Linear(30, 128)
-        self.fc3 = nn.Linear(128, 256)
-        self.fc4 = nn.Linear(256, 256)
-        self.fc5 = nn.Linear(256, 128)
-        self.fc6 = nn.Linear(128, 100)
-        self.fc7 = nn.Linear(100, 25)
-        self.fcf = nn.Linear(25, 1) #si 1 hausse si 0 baisse
+        super(Linear_QNet, self).__init__()
+        self.fc1 = nn.Linear(enter,32)
+        self.fc2 = nn.Linear(32, 54)
+        self.fc3 = nn.Linear(54, 40)
+        self.fc4 = nn.Linear(40, 10)
+        self.fcf = nn.Linear(10, 1) #si 1 hausse si 0 baisse
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
         x = F.relu(self.fc4(x))
-        x = F.relu(self.fc5(x))
-        x = F.relu(self.fc6(x))
-        x = F.relu(self.fc7(x))
         x = torch.sigmoid(self.fcf(x))
         return x
+    
+    # def __init__(self, input_size):
+    #     super().__init__()
+    #     self.fc1 = nn.Linear(input_size,32)
+    #     self.fc2 = nn.Linear(32, 64)
+    #     self.fcf = nn.Linear(64, 1) #si 1 hausse si 0 baisse
+        
+
+    # def forward(self, x):
+    #     x = F.relu(self.fc1(x))
+    #     x = F.relu(self.fc2(x))
+    #     x = F.sigmoid(self.fcf(x))
+    #     return x
+
+    def save(self, file_name='model.pth'):
+        model_folder_path = './model'
+        if not os.path.exists(model_folder_path):
+            os.makedirs(model_folder_path)
+
+        file_name = os.path.join(model_folder_path, file_name)
+        torch.save(self.state_dict(), file_name)
+
 #%% variables
 nbEpoch = 500
 lr=0.001
-pathTrainData = '../trainData/mainCoinData.csv'
+pathTrainData = '../System_macro_sigmoid/trainData/mainCoinData.csv'
 
 #%% model IA ------------------------------
 df = pd.read_csv(pathTrainData)
@@ -100,7 +117,7 @@ x_test = torch.from_numpy(x_test.to_numpy()).float()
 y_test = torch.squeeze(torch.from_numpy(y_test.to_numpy()).float())
 
 #definition du model
-net = Net(x_train.shape[1]) # l'importer du .py du model
+net = Linear_QNet(x_train.shape[1]) # l'importer du .py du model
 criterion = nn.BCELoss()
 optimizer = optim.Adam(net.parameters(), lr)
 

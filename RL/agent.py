@@ -8,6 +8,10 @@ import os
 from model import Linear_QNet, QTrainer
 from helper import plot
 
+pathModel = "pre-trained_model"
+sys.path.append(os.path.abspath(pathModel))
+from initModel import xdef
+
 pathFunctions = "../src/"
 sys.path.append(os.path.abspath(pathFunctions))
 import functions as f
@@ -23,7 +27,7 @@ class Agent :
         self.gamma = 0.9
         self.memory = deque(maxlen = MAX_MEMORY)
         
-        self.model = Linear_QNet(17)
+        self.model = Linear_QNet(9)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
     
     def get_state(self, tradeGame) :
@@ -46,7 +50,7 @@ class Agent :
     
     def get_action(self,state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon = 40 - self.n_games
+        self.epsilon = 0 - self.n_games
         if random.randint(0, 200) < self.epsilon:
             prediction = random.random()
         else:
@@ -67,13 +71,16 @@ def train() :
     while True :
         # get old state
         state_old = agent.get_state(tradeGame)
+        # print(state_old)
         
         # get move 
         final_trade = agent.get_action(state_old)
+        print(final_trade)
         
         # perform trade and get new state
         reward, done, score = tradeGame.play_step(final_trade)
         state_new = agent.get_state(tradeGame)
+        # print(reward)
         
         # train short memory
         agent.train_short_memory(state_old, final_trade, reward, state_new, done)
@@ -89,7 +96,7 @@ def train() :
             
             if score > record :
                 record = score
-                # agent.model.save()
+                agent.model.save()
             
             print('n_games : ', agent.n_games,'Score : ', score, 'Record : ', record)
             
